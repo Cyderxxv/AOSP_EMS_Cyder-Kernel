@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ OR BSD-3-Clause */
 /*
  * Copyright (c) 2016-present, Yann Collet, Facebook, Inc.
  * All rights reserved.
@@ -17,9 +18,10 @@
 #ifndef ZSTD_H
 #define ZSTD_H
 
-/* ======   Dependency   ======*/
-#include <linux/types.h>   /* size_t */
-
+/* ======   Dependency   ====== */
+#include <linux/types.h>
+#include <linux/zstd_errors.h>
+#include <linux/zstd_lib.h>
 
 /*-*****************************************************************************
  * Introduction
@@ -921,18 +923,19 @@ unsigned int ZSTD_getDictID_fromDDict(const ZSTD_DDict *ddict);
 unsigned int ZSTD_getDictID_fromFrame(const void *src, size_t srcSize);
 
 /**
- * struct ZSTD_frameParams - zstd frame parameters stored in the frame header
- * @frameContentSize: The frame content size, or 0 if not present.
+ * struct zstd_frame_params - zstd frame parameters stored in the frame header
+ * @frameContentSize: The frame content size, or ZSTD_CONTENTSIZE_UNKNOWN if not
+ *                    present.
  * @windowSize:       The window size, or 0 if the frame is a skippable frame.
+ * @blockSizeMax:     The maximum block size.
+ * @frameType:        The frame type (zstd or skippable)
+ * @headerSize:       The size of the frame header.
  * @dictID:           The dictionary id, or 0 if not present.
  * @checksumFlag:     Whether a checksum was used.
+ *
+ * See zstd_lib.h.
  */
-typedef struct {
-	unsigned long long frameContentSize;
-	unsigned int windowSize;
-	unsigned int dictID;
-	unsigned int checksumFlag;
-} ZSTD_frameParams;
+typedef ZSTD_frameHeader zstd_frame_header;
 
 /**
  * ZSTD_getFrameParams() - extracts parameters from a zstd or skippable frame
